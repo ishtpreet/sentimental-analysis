@@ -35,7 +35,7 @@
             var last = event.results.length - 1;
             var command = event.results[last][0].transcript;
             message.textContent = 'Voice Input: ' + command + '.';
-            document.getElementById("textSpeech").style.display = 'block';
+            //document.getElementById("textSpeech").style.display = 'block';
             document.getElementById("subButton").style.display = 'block';
             document.getElementById("textSpeech").value = command;
         };
