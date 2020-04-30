@@ -4,56 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Speech Recording</title>
+    <title>Document</title>
 </head>
 <body>
-  <script>
-    window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-    let finalTranscript = '';
-    let recognition = new window.SpeechRecognition();
+    
+    <button id='btnGiveCommand'>Speak!</button>
+    <br><br>
+    <span id='message'></span>
+    <br><br>
+    <form action="/get_text" method="post">
+    <input type="text" value="" name="textFromSpeech" id="textSpeech" style="display: none;">
+    <input type="submit" id="subButton" style="display: none;">
+</form>
+    <script>
+        var message = document.querySelector('#message');
 
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 10;
-    recognition.continuous = true;
+        var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+        var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
 
-    recognition.onresult = (event) => {
-      let interimTranscript = '';
-      for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
-        let transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interimTranscript += transcript;
-        }
-      }
+        var grammar = '#JSGF V1.0;'
 
-      document.querySelector('body').innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</>';
-    }
+        var recognition = new SpeechRecognition();
+        var speechRecognitionList = new SpeechGrammarList();
+        speechRecognitionList.addFromString(grammar, 1);
+        recognition.grammars = speechRecognitionList;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
 
-    $('#submit').click(function() {
-        var sentence = 'TEXT'
-        $.ajax({
-          type: "POST",
-          contentType: "application/json;charset=utf-8",
-          url: "appTest.py/get_text",
-          traditional: "true",
-          data: JSON.stringify(sentence),
-          dataType: "json"
-          });
-      });
+        recognition.onresult = function(event) {
+            var last = event.results.length - 1;
+            var command = event.results[last][0].transcript;
+            message.textContent = 'Voice Input: ' + command + '.';
+            document.getElementById("textSpeech").style.display = 'block';
+            document.getElementById("subButton").style.display = 'block';
+            document.getElementById("textSpeech").value = command;
+        };
 
-    function startSpeech(){
-      recognition.start();
-    }
-    function stopSpeech(){
-      recognition.stop();
-    }
-  </script>
+        recognition.onspeechend = function() {
+            recognition.stop();
+        };
 
-    <form action="/get_text" method="post" enctype="multipart/form-data">
-        <input type='button' value='Start Speech Recognition' onclick="startSpeech()">
-        <input type='button' value='Stop Speech Recognition' onclick="stopSpeech()">
-        <input type="submit" value="Show Text" id='submit'>
-    </form>
+        recognition.onerror = function(event) {
+            message.textContent = 'Error occurred in recognition: ' + event.error;
+        }        
+
+        document.querySelector('#btnGiveCommand').addEventListener('click', function(){
+            recognition.start();
+
+        });
+
+
+    </script>
 </body>
-</html> 
+</html>

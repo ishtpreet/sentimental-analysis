@@ -8,13 +8,15 @@ def tryHTML():
 
 @app.route('/get_text', methods=['GET', 'POST'])
 def get_text():
-	if request.method == 'POST':
-		text = request.get_json()
+	# if request.method == 'POST':
+	# 	text = request.get_json()
 		
-	else:
-		print('Some ERROR occured')
+	# else:
+	# 	print('Some ERROR occured')
+	if request.method == "POST":
+		textFromSpeech = request.form["textFromSpeech"]
 
-	return render_template('result.html', text = text) 
+	return render_template('result.html', textFromSpeech = textFromSpeech) 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
